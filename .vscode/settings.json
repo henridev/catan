@@ -1,0 +1,6 @@
+{
+    "editor.mouseWheelZoom": true,
+    "window.zoomLevel": 0.8,
+    "rust-analyzer.procMacro.enable": true,
+    "editor.renderWhitespace": "all"
+}
