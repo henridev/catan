@@ -1,0 +1,7 @@
+<svg width="100" height="110" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="green" />
+  <path fill="brown" d="M45,70 l10,-30 l10,30 z" />
+  <circle fill="darkgreen" cx="50" cy="50" r="15" />
+  <circle fill="darkgreen" cx="62" cy="57" r="15" />
+  <circle fill="darkgreen" cx="38" cy="57" r="15" />
+</svg>

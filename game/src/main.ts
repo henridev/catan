@@ -1,4 +1,4 @@
-import config from './config';
-import { Game } from "phaser";
+import config from './config'
+import { Game } from 'phaser'
 
-export default new Game(config);
+export default new Game(config)
