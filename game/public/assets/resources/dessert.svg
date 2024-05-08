@@ -1,0 +1,13 @@
+<svg width="100" height="110" xmlns="http://www.w3.org/2000/svg">
+  <!-- Base layer of the dessert -->
+  <polygon points="50,10 90,30 90,80 50,100 10,80 10,30" fill="#D2691E" /> <!-- Chocolate color -->
+  <!-- Middle layer of the dessert, perhaps a creamy layer -->
+  <rect fill="#FFDAB9" x="15" y="40" width="70" height="20" /> <!-- Peach puff color resembling cream -->
+  <!-- Top layer of frosting -->
+  <rect fill="#FFF8DC" x="15" y="60" width="70" height="15" /> <!-- Cornsilk color resembling light
+  frosting -->
+  <!-- Decorative line in the middle of the cream layer -->
+  <line x1="15" y1="50" x2="85" y2="50" stroke="#FFDAB9" stroke-width="2" />
+  <!-- Cherry on top -->
+  <circle cx="50" cy="25" r="5" fill="red" />
+</svg>

@@ -1,4 +1,6 @@
-const basic = {
+import { Setup } from './type'
+
+const basic: Setup = {
   wood: {
     amount: 4,
     position: {
@@ -7,14 +9,14 @@ const basic = {
     },
   },
   brick: {
-    amount: 4,
+    amount: 3,
     position: {
       x: 200,
       y: 100,
     },
   },
   stone: {
-    amount: 4,
+    amount: 3,
     position: {
       x: 300,
       y: 100,
@@ -31,6 +33,13 @@ const basic = {
     amount: 4,
     position: {
       x: 500,
+      y: 100,
+    },
+  },
+  dessert: {
+    amount: 1,
+    position: {
+      x: 600,
       y: 100,
     },
   },
