@@ -1,14 +1,21 @@
-import basic from './basic'
+import basic, { basicPoint } from './basic'
 import GameMode from './mode'
-import { Setup } from './type'
+import { BasicPoint, Setup } from './type'
 
 type Modes = {
   [key in GameMode]: Setup
 }
 
-const setups: Modes = {
+type Point = {
+  [key in GameMode]: BasicPoint
+}
+
+export const setups: Modes = {
   [GameMode.BASIC]: basic,
   [GameMode.BASIC_EXPANSION]: basic,
 }
 
-export default setups
+export const points: Point = {
+  [GameMode.BASIC]: basicPoint,
+  [GameMode.BASIC_EXPANSION]: basicPoint,
+}

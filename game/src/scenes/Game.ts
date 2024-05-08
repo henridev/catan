@@ -1,17 +1,19 @@
 import { Scene, GameObjects } from 'phaser'
-import { Setup } from '../config/modes/type'
-import { HEIGHT, WIDTH, X_CENTER, Y_CENTER } from '../config'
+import { BasicPoint, Setup } from '../config/modes/type'
+import { X_CENTER, Y_CENTER } from '../config'
 import { OptionMenu } from './Options'
-import Hexagon from '../components/hexagon'
+import { setups, points } from '../config/modes'
+import HexagonFactory from '../components/hexagon-factory'
 import Scenes from '../config/scene'
 import GameMode from '../config/modes/mode'
-import setups from '../config/modes'
+import Point from '../components/point'
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera
   background: GameObjects.Image
   msg_text: GameObjects.Text
   setup: Setup
+  gamePoints: BasicPoint
   coordText: GameObjects.Text
   gameMode: GameMode
 
@@ -32,38 +34,40 @@ export class Game extends Scene {
   init(data: OptionMenu) {
     // option passed from the options scene
     this.setup = setups[data?.mode ?? GameMode.BASIC]
-    console.log({ data })
+    this.gamePoints = points[data?.mode ?? GameMode.BASIC]
   }
 
   create() {
     this.camera = this.cameras.main
     this.setInputEvents()
     this.drawPointer()
-    const hex = new Hexagon(this)
+    const hexFactory = new HexagonFactory(this)
     const radius = 60
     const horizontalSpacing = Math.sqrt(3) * radius // 60 is the radius
     const verticalSpacing = (3 / 2) * radius
-    hex.draw(X_CENTER, Y_CENTER, radius)
-    hex.draw(X_CENTER + horizontalSpacing, Y_CENTER, radius)
-    hex.draw(X_CENTER - horizontalSpacing, Y_CENTER, radius)
-    hex.draw(X_CENTER + horizontalSpacing * 2, Y_CENTER, radius)
-    hex.draw(X_CENTER - horizontalSpacing * 2, Y_CENTER, radius)
-    hex.draw(X_CENTER - horizontalSpacing / 2, Y_CENTER - verticalSpacing, radius)
-    hex.draw(X_CENTER - horizontalSpacing / 2, Y_CENTER + verticalSpacing, radius)
-    hex.draw(X_CENTER + horizontalSpacing / 2, Y_CENTER - verticalSpacing, radius)
-    hex.draw(X_CENTER + horizontalSpacing / 2, Y_CENTER + verticalSpacing, radius)
-    hex.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing, Y_CENTER - verticalSpacing, radius)
-    hex.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing, Y_CENTER + verticalSpacing, radius)
-    hex.draw(X_CENTER - horizontalSpacing / 2 - horizontalSpacing, Y_CENTER - verticalSpacing, radius)
-    hex.draw(X_CENTER - horizontalSpacing / 2 - horizontalSpacing, Y_CENTER + verticalSpacing, radius)
-    hex.draw(X_CENTER - horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER - verticalSpacing * 2, radius)
-    hex.draw(X_CENTER - horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER + verticalSpacing * 2, radius)
-    hex.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER - verticalSpacing * 2, radius)
-    hex.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER + verticalSpacing * 2, radius)
-    hex.draw(X_CENTER - horizontalSpacing, Y_CENTER + verticalSpacing * 2, radius)
-    hex.draw(X_CENTER - horizontalSpacing, Y_CENTER - verticalSpacing * 2, radius)
+
+    hexFactory.draw(X_CENTER, Y_CENTER, radius)
+    hexFactory.draw(X_CENTER + horizontalSpacing, Y_CENTER, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing, Y_CENTER, radius)
+    hexFactory.draw(X_CENTER + horizontalSpacing * 2, Y_CENTER, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing * 2, Y_CENTER, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing / 2, Y_CENTER - verticalSpacing, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing / 2, Y_CENTER + verticalSpacing, radius)
+    hexFactory.draw(X_CENTER + horizontalSpacing / 2, Y_CENTER - verticalSpacing, radius)
+    hexFactory.draw(X_CENTER + horizontalSpacing / 2, Y_CENTER + verticalSpacing, radius)
+    hexFactory.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing, Y_CENTER - verticalSpacing, radius)
+    hexFactory.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing, Y_CENTER + verticalSpacing, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing / 2 - horizontalSpacing, Y_CENTER - verticalSpacing, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing / 2 - horizontalSpacing, Y_CENTER + verticalSpacing, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER - verticalSpacing * 2, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER + verticalSpacing * 2, radius)
+    hexFactory.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER - verticalSpacing * 2, radius)
+    hexFactory.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER + verticalSpacing * 2, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing, Y_CENTER + verticalSpacing * 2, radius)
+    hexFactory.draw(X_CENTER - horizontalSpacing, Y_CENTER - verticalSpacing * 2, radius)
 
     this.addResources()
+    this.addPoints()
   }
 
   private addResources() {
@@ -75,6 +79,22 @@ export class Game extends Scene {
           .setData('isInDropZone', false)
           .setData('origin', { x: v.position.x, y: v.position.y })
         this.input.setDraggable(image)
+      }
+    })
+  }
+
+  private addPoints() {
+    Object.entries(this.gamePoints).forEach(([k, { position, amount }]) => {
+      for (let i = 0; i < amount; i++) {
+        const gamepoint = new Point(this)
+        gamepoint.draw(position.x, position.y, 60 * 0.4, k as unknown as number)
+
+        // const image = this.add
+        //   .image(v.position.x, v.position.y, k)
+        //   .setInteractive()
+        //   .setData('isInDropZone', false)
+        //   .setData('origin', { x: v.position.x, y: v.position.y })
+        // this.input.setDraggable(image)
       }
     })
   }

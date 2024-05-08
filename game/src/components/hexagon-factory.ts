@@ -1,6 +1,7 @@
 import { Scene, GameObjects } from 'phaser'
+import Point from './point'
 
-class Hexagon {
+class HexagonFactory {
   scene: Scene
 
   constructor(scene: Scene) {
@@ -21,7 +22,7 @@ class Hexagon {
     })
     graphics.closePath()
     graphics.strokePath()
-
+    console.log({ graphics })
     var color = new Phaser.Display.Color()
     color.random(50)
 
@@ -38,7 +39,7 @@ class Hexagon {
     dropZone.setData('objects', [])
     // dropzone.setPosition(centerX, centerY)
 
-    this.setInputEvents(centerX, centerY, graphics, points)
+    this.setInputEvents(graphics, points)
   }
 
   private getPoints(x: number, y: number, radius: number) {
@@ -55,8 +56,6 @@ class Hexagon {
   }
 
   private setInputEvents(
-    centerX: number,
-    centerY: number,
     graphics: GameObjects.Graphics,
     points: {
       x: number
@@ -118,4 +117,4 @@ class Hexagon {
   }
 }
 
-export default Hexagon
+export default HexagonFactory

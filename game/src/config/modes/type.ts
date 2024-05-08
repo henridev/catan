@@ -16,3 +16,13 @@ export type Setup = {
     }
   }
 }
+
+export type BasicPoint = {
+  [key: number]: {
+    amount: number
+    position: {
+      x: number
+      y: number
+    }
+  }
+}
