@@ -2,7 +2,7 @@ import { Scene, GameObjects } from 'phaser'
 import { OptionMenu } from './Options'
 import GameMode from '../config/modes/mode'
 import Scenes from '../config/scene'
-import { WIDTH } from '../config'
+import { WIDTH, X_CENTER } from '../config'
 
 export class MainMenu extends Scene {
   background: GameObjects.Image
@@ -21,15 +21,14 @@ export class MainMenu extends Scene {
   }
 
   create() {
-    this.background = this.add.image(WIDTH / 2, 384, 'background')
-    this.logo = this.add.image(WIDTH / 2, 300, 'logo')
+    this.background = this.add.image(X_CENTER, 384, 'background')
+    this.logo = this.add.image(X_CENTER, 300, 'logo')
 
     this.menuItems = [
-      this.createMenuItem(WIDTH / 2, 450, 'Start Game', () => this.scene.start(Scenes.Game, { mode: this.gameMode })),
-      this.createMenuItem(WIDTH / 2, 500, 'Options', () => this.scene.start(Scenes.Options)),
-      this.createMenuItem(WIDTH / 2, 550, 'Exit', () => this.closeGame()),
+      this.createMenuItem(X_CENTER, 450, 'Start Game', () => this.scene.start(Scenes.Game, { mode: this.gameMode })),
+      this.createMenuItem(X_CENTER, 500, 'Options', () => this.scene.start(Scenes.Options)),
+      this.createMenuItem(X_CENTER, 550, 'Exit', () => this.closeGame()),
     ]
-
     this.menuItems.forEach((item) => {
       item
         .setInteractive({ useHandCursor: true })
@@ -49,7 +48,6 @@ export class MainMenu extends Scene {
         align: 'center',
       })
       .setOrigin(0.5)
-      .setInteractive()
       .on('pointerdown', callback)
   }
 

@@ -23,11 +23,13 @@ class Point {
       .removeInteractive()
 
     const container = this.scene.add.container(centerX, centerY, [graphics, text])
+    
 
     container
       .setSize(radius * 2, radius * 2)
       .setInteractive() // Set size of container to encapsulate the circle
       .setData('type', 'point')
+      .setData('origin', { x: centerX, y: centerY })
 
     // Add drag functionality
     this.scene.input.setDraggable(container)

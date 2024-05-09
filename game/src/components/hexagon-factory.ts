@@ -21,8 +21,7 @@ class HexagonFactory {
     })
     graphics.closePath()
     graphics.strokePath()
-    console.log({ graphics })
-    var color = new Phaser.Display.Color()
+    let color = new Phaser.Display.Color()
     color.random(50)
 
     const hexagonShape = new Phaser.Geom.Polygon(points)
@@ -51,6 +50,7 @@ class HexagonFactory {
         y: y + radius * Math.sin(angle), // opposite side / hypotenuse scale 1
       })
     }
+    console.log({ points })
     return points
   }
 
@@ -98,7 +98,12 @@ class HexagonFactory {
 
     this.scene.input.on('drop', (_: any, gameObject: GameObjects.Image, dropZone: GameObjects.Polygon) => {
       console.log({ gameObject })
-      if (dropZone.getData('objects').length > 0) return
+      if (dropZone.getData('objects').length >= 2) return
+      if (
+        dropZone.getData('objects').length === 1 &&
+        dropZone.getData('objects')[0].getData('type') === gameObject.getData('type')
+      )
+        return
       dropZone.getData('objects').push(gameObject) // Add to dropzone
       gameObject.setData('isInDropZone', true)
       const xs = dropZone.pathData.filter((_, i) => (i & 1) === 0)

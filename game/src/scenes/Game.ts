@@ -42,6 +42,13 @@ export class Game extends Scene {
     this.camera = this.cameras.main
     this.setInputEvents()
     this.drawPointer()
+    this.addBoard()
+
+    this.addResources()
+    this.addPoints()
+  }
+
+  private addBoard() {
     const hexFactory = new HexagonFactory(this)
     const radius = 60
     const horizontalSpacing = Math.sqrt(3) * radius // 60 is the radius
@@ -66,9 +73,6 @@ export class Game extends Scene {
     hexFactory.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER + verticalSpacing * 2, radius)
     hexFactory.draw(X_CENTER - horizontalSpacing, Y_CENTER + verticalSpacing * 2, radius)
     hexFactory.draw(X_CENTER - horizontalSpacing, Y_CENTER - verticalSpacing * 2, radius)
-
-    this.addResources()
-    this.addPoints()
   }
 
   private addResources() {
@@ -92,16 +96,19 @@ export class Game extends Scene {
     this.coordText = this.add.text(10, 10, '', {
       font: '16px Arial',
     })
-
-    this.input.on('pointermove', (pointer: { x: any; y: any }) => {
-      this.coordText.setText(`Pointer X: ${pointer.x}, Pointer Y: ${pointer.y}`)
-    })
   }
 
   private setInputEvents() {
-    this.input.on('drag', (_: any, gameObject: { x: number; y: number }, dragX: number, dragY: number) => {
-      gameObject.x = dragX
-      gameObject.y = dragY
+    this.input.on(
+      'drag',
+      (_: any, gameObject: GameObjects.Image | GameObjects.Polygon, dragX: number, dragY: number) => {
+        gameObject.x = dragX
+        gameObject.y = dragY
+      },
+    )
+
+    this.input.on('pointermove', (pointer: { x: any; y: any }) => {
+      this.coordText.setText(`Pointer X: ${pointer.x}, Pointer Y: ${pointer.y}`)
     })
   }
 }
