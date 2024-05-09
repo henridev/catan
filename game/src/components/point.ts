@@ -7,7 +7,7 @@ class Point {
     this.scene = scene
   }
 
-  public draw(centerX: number, centerY: number, radius: number, numberText: number) {
+  public draw(x: number, y: number, radius: number, numberText: number) {
     const graphics = this.scene.add.graphics({ fillStyle: { color: 0xff0000 } })
     graphics.fillCircle(0, 0, radius)
     const text = this.scene.add
@@ -22,14 +22,13 @@ class Point {
       .setOrigin(0.5, 0.5)
       .removeInteractive()
 
-    const container = this.scene.add.container(centerX, centerY, [graphics, text])
-    
+    const container = this.scene.add.container(x, y, [graphics, text])
 
     container
       .setSize(radius * 2, radius * 2)
       .setInteractive() // Set size of container to encapsulate the circle
-      .setData('type', 'point')
-      .setData('origin', { x: centerX, y: centerY })
+      .setData({ isInDropZone: false, origin: { x, y }, type: 'point' })
+      .setDepth(10)
 
     // Add drag functionality
     this.scene.input.setDraggable(container)

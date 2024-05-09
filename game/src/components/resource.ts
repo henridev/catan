@@ -5,9 +5,8 @@ class Resource {
     const image = scene.add
       .image(x, y, imageName)
       .setInteractive()
-      .setData('isInDropZone', false)
-      .setData('origin', { x, y })
-      .setData('type', 'resource')
+      .setData({ isInDropZone: false, origin: { x, y }, type: 'point' })
+
     scene.input.setDraggable(image)
   }
 }

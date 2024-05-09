@@ -3,11 +3,12 @@ import { BasicPoint, Setup } from '../config/modes/type'
 import { X_CENTER, Y_CENTER } from '../config'
 import { OptionMenu } from './Options'
 import { setups, points } from '../config/modes'
-import HexagonFactory from '../components/hexagon-factory'
+import Hexagon from '../components/hexagon'
 import Scenes from '../config/scene'
 import GameMode from '../config/modes/mode'
 import Point from '../components/point'
 import Resource from '../components/resource'
+import GameEventManager from '../services/GameEventManager'
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera
@@ -40,39 +41,54 @@ export class Game extends Scene {
 
   create() {
     this.camera = this.cameras.main
-    this.setInputEvents()
     this.drawPointer()
     this.addBoard()
-
     this.addResources()
     this.addPoints()
+    new GameEventManager(this)
   }
 
   private addBoard() {
-    const hexFactory = new HexagonFactory(this)
+    const hexFactory = new Hexagon(this)
     const radius = 60
-    const horizontalSpacing = Math.sqrt(3) * radius // 60 is the radius
-    const verticalSpacing = (3 / 2) * radius
-
-    hexFactory.draw(X_CENTER, Y_CENTER, radius)
-    hexFactory.draw(X_CENTER + horizontalSpacing, Y_CENTER, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing, Y_CENTER, radius)
-    hexFactory.draw(X_CENTER + horizontalSpacing * 2, Y_CENTER, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing * 2, Y_CENTER, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing / 2, Y_CENTER - verticalSpacing, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing / 2, Y_CENTER + verticalSpacing, radius)
-    hexFactory.draw(X_CENTER + horizontalSpacing / 2, Y_CENTER - verticalSpacing, radius)
-    hexFactory.draw(X_CENTER + horizontalSpacing / 2, Y_CENTER + verticalSpacing, radius)
-    hexFactory.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing, Y_CENTER - verticalSpacing, radius)
-    hexFactory.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing, Y_CENTER + verticalSpacing, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing / 2 - horizontalSpacing, Y_CENTER - verticalSpacing, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing / 2 - horizontalSpacing, Y_CENTER + verticalSpacing, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER - verticalSpacing * 2, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER + verticalSpacing * 2, radius)
-    hexFactory.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER - verticalSpacing * 2, radius)
-    hexFactory.draw(X_CENTER + horizontalSpacing / 2 + horizontalSpacing / 2, Y_CENTER + verticalSpacing * 2, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing, Y_CENTER + verticalSpacing * 2, radius)
-    hexFactory.draw(X_CENTER - horizontalSpacing, Y_CENTER - verticalSpacing * 2, radius)
+    const xSpacing = Math.sqrt(3) * radius // 60 is the radius
+    const ySpacing = (3 / 2) * radius
+    const layout = [
+      [
+        [-1, 2],
+        [0, 2],
+        [1, 2],
+      ],
+      [
+        [-1.5, 1],
+        [-0.5, 1],
+        [0.5, 1],
+        [1.5, 1],
+      ],
+      [
+        [-2, 0],
+        [-1, 0],
+        [0, 0],
+        [1, 0],
+        [2, 0],
+      ],
+      [
+        [-1.5, -1],
+        [-0.5, -1],
+        [0.5, -1],
+        [1.5, -1],
+      ],
+      [
+        [-1, -2],
+        [0, -2],
+        [1, -2],
+      ],
+    ]
+    layout.forEach((row) =>
+      row.forEach(([x, y]) => {
+        hexFactory.draw(X_CENTER + xSpacing * x, Y_CENTER + ySpacing * y, radius)
+      }),
+    )
   }
 
   private addResources() {
@@ -93,22 +109,8 @@ export class Game extends Scene {
   }
 
   private drawPointer() {
-    this.coordText = this.add.text(10, 10, '', {
+    this.coordText = this.add.text(10, 10, [0, 0], {
       font: '16px Arial',
-    })
-  }
-
-  private setInputEvents() {
-    this.input.on(
-      'drag',
-      (_: any, gameObject: GameObjects.Image | GameObjects.Polygon, dragX: number, dragY: number) => {
-        gameObject.x = dragX
-        gameObject.y = dragY
-      },
-    )
-
-    this.input.on('pointermove', (pointer: { x: any; y: any }) => {
-      this.coordText.setText(`Pointer X: ${pointer.x}, Pointer Y: ${pointer.y}`)
     })
   }
 }
