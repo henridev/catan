@@ -1,5 +1,4 @@
 import { Scene, GameObjects } from 'phaser'
-import Point from './point'
 
 class HexagonFactory {
   scene: Scene
@@ -98,6 +97,7 @@ class HexagonFactory {
     })
 
     this.scene.input.on('drop', (_: any, gameObject: GameObjects.Image, dropZone: GameObjects.Polygon) => {
+      console.log({ gameObject })
       if (dropZone.getData('objects').length > 0) return
       dropZone.getData('objects').push(gameObject) // Add to dropzone
       gameObject.setData('isInDropZone', true)

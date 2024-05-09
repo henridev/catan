@@ -7,6 +7,7 @@ import HexagonFactory from '../components/hexagon-factory'
 import Scenes from '../config/scene'
 import GameMode from '../config/modes/mode'
 import Point from '../components/point'
+import Resource from '../components/resource'
 
 export class Game extends Scene {
   camera: Phaser.Cameras.Scene2D.Camera
@@ -73,12 +74,7 @@ export class Game extends Scene {
   private addResources() {
     Object.entries(this.setup).forEach(([k, v]) => {
       for (let i = 0; i < v.amount; i++) {
-        const image = this.add
-          .image(v.position.x, v.position.y, k)
-          .setInteractive()
-          .setData('isInDropZone', false)
-          .setData('origin', { x: v.position.x, y: v.position.y })
-        this.input.setDraggable(image)
+        Resource.draw(this, v.position.x, v.position.y, k)
       }
     })
   }
@@ -88,13 +84,6 @@ export class Game extends Scene {
       for (let i = 0; i < amount; i++) {
         const gamepoint = new Point(this)
         gamepoint.draw(position.x, position.y, 60 * 0.4, k as unknown as number)
-
-        // const image = this.add
-        //   .image(v.position.x, v.position.y, k)
-        //   .setInteractive()
-        //   .setData('isInDropZone', false)
-        //   .setData('origin', { x: v.position.x, y: v.position.y })
-        // this.input.setDraggable(image)
       }
     })
   }

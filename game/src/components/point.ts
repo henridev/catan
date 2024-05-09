@@ -8,10 +8,8 @@ class Point {
   }
 
   public draw(centerX: number, centerY: number, radius: number, numberText: number) {
-    console.log('draw')
     const graphics = this.scene.add.graphics({ fillStyle: { color: 0xff0000 } })
     graphics.fillCircle(0, 0, radius)
-    // this.scene.input.setDraggable(graphics)
     const text = this.scene.add
       .text(0, 0, numberText.toString(), {
         fontFamily: 'Arial Black',
@@ -26,8 +24,10 @@ class Point {
 
     const container = this.scene.add.container(centerX, centerY, [graphics, text])
 
-    container.setSize(radius * 2, radius * 2) // Set size of container to encapsulate the circle
-    container.setInteractive()
+    container
+      .setSize(radius * 2, radius * 2)
+      .setInteractive() // Set size of container to encapsulate the circle
+      .setData('type', 'point')
 
     // Add drag functionality
     this.scene.input.setDraggable(container)
