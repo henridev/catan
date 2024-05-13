@@ -2,7 +2,7 @@ import { Scene, GameObjects } from 'phaser'
 import { OptionMenu } from './Options'
 import GameMode from '../config/modes/mode'
 import Scenes from '../config/scene'
-import { WIDTH, X_CENTER } from '../config'
+import { X_CENTER } from '../config/constants'
 
 export class MainMenu extends Scene {
   background: GameObjects.Image
@@ -37,7 +37,7 @@ export class MainMenu extends Scene {
     })
   }
 
-  createMenuItem(x: number, y: number, text: string, callback: Function): GameObjects.Text {
+  private createMenuItem(x: number, y: number, text: string, callback: Function): GameObjects.Text {
     return this.add
       .text(x, y, text, {
         fontFamily: 'Arial Black',
@@ -51,7 +51,7 @@ export class MainMenu extends Scene {
       .on('pointerdown', callback)
   }
 
-  closeGame() {
+  private closeGame() {
     // Implement game close functionality, if applicable for your environment
     console.log('Exit game') // Placeholder
   }

@@ -5,9 +5,20 @@ export enum Resource {
   Wheat = 'wheat',
   Sheep = 'sheep',
   Dessert = 'dessert',
+  Ocean = 'ocean',
 }
 
-export type Setup = {
+export type PointSetup = {
+  [key: number]: {
+    amount: number
+    position: {
+      x: number
+      y: number
+    }
+  }
+}
+
+export type ResourceSetup = {
   [key in Resource]: {
     amount: number
     position: {
@@ -17,12 +28,10 @@ export type Setup = {
   }
 }
 
-export type BasicPoint = {
-  [key: number]: {
-    amount: number
-    position: {
-      x: number
-      y: number
-    }
-  }
+export type Layout = number[][][]
+
+export type Setup = {
+  resources: ResourceSetup
+  points: PointSetup
+  layout: Layout
 }

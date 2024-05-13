@@ -1,8 +1,8 @@
 import { Scene } from 'phaser'
 import GameModes from '../config/modes/mode'
 import GameMode from '../config/modes/mode'
-import { WIDTH } from '../config'
 import Scenes from '../config/scene'
+import { X_CENTER } from '../config/constants'
 
 export interface OptionMenu {
   mode: GameMode
@@ -16,7 +16,7 @@ export class Options extends Scene {
   create() {
     // Title for the options menu
     this.add
-      .text(WIDTH / 2, 100, 'Select Game Mode', {
+      .text(X_CENTER, 100, 'Select Game Mode', {
         fontFamily: 'Arial Black',
         fontSize: 26,
         color: '#ffffff',
@@ -29,7 +29,7 @@ export class Options extends Scene {
     // Game mode options
     const gameModes = [GameModes.BASIC, GameModes.BASIC_EXPANSION]
     gameModes.forEach((mode, index) => {
-      this.createGameModeButton(WIDTH / 2, 200 + index * 50, mode, () => {
+      this.createGameModeButton(X_CENTER, 200 + index * 50, mode, () => {
         this.selectGameMode(mode)
       })
     })
