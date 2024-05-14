@@ -47,86 +47,56 @@ class GameEventManager {
     this.scene.children.bringToTop(gameObject)
     if (gameObject.dataService.getDataTyped('isInDropZone')) {
     }
-    gameObject.dataService.setDataByKey('origin', { x: gameObject.x, y: gameObject.y })
   }
 
-  private handleDragEnter(_: Input.Pointer, __: Resource | Point, dropZone: Tile) {
+  private handleDragEnter(_: Input.Pointer, gameObject: Resource | Point, dropZone: Tile) {
     dropZone.setFillStyle(0xf5ff)
+    // gameObject.dataService.setDataByKey('tile', dropZone)
   }
 
   private handleDragLeave(_: Input.Pointer, gameObject: Resource | Point, dropZone: Tile) {
-    const {
-      data: { values },
-    } = dropZone
-
-    if (gameObject instanceof Resource) {
-      values.resource = undefined
-    }
-    if (gameObject instanceof Point) {
-      values.point = undefined
-    }
-
-    gameObject.dataService.setDataByKey('isInDropZone', false)
+    // gameObject.dataService.setDataByKey('tile', undefined)
     dropZone.setFillStyle(dropZone.dataService.getDataTyped('colorOrigin'))
+    gameObject.dataService.setDataByKey('isInDropZone', false)
   }
 
   private hanldeDrop(_: Input.Pointer, gameObject: Resource | Point, dropZone: Tile, isRandomizer?: boolean) {
     const resource = dropZone.dataService.getDataTyped('resource')
-    const point = dropZone.dataService.getDataTyped('point')
+    // const point = dropZone.dataService.getDataTyped('point')
 
-    if (isRandomizer) {
-      if (gameObject instanceof Point) {
-        dropZone.dataService.setDataByKey('point', gameObject)
-        gameObject.dataService.setDataByKey('tile', dropZone)
-        gameObject.setDepth(2)
-      }
-      if (gameObject instanceof Resource) {
-        dropZone.dataService.setDataByKey('resource', gameObject)
-        gameObject.dataService.setDataByKey('tile', dropZone)
-        gameObject.setDepth(1)
-      }
-      return
-    }
+    const isPointOnDessert = resource?.data?.values.type === ResourceType.Dessert && gameObject instanceof Point
+    if (isPointOnDessert) return
 
-    // if (resource && gameObject instanceof Resource) {
-    //   const x = resource.x
-    //   const y = resource.y
-    //   resource.x = gameObject.getData('origin-tile').x
-    //   resource.y = gameObject.getData('origin-tile').y
-    //   gameObject.x = x
-    //   gameObject.y = y
-    //   gameObject.setData('origin-tile', { x: gameObject.x, y: gameObject.y })
-    //   console.log({ x: resource.x, y: resource.y })
-    //   console.log({ x: gameObject.x, y: gameObject.x })
-    //   resource.setData('origin-tile', { x: resource.x, y: resource.y })
-    //   dropZone.dataService.setDataByKey('resource', gameObject)
-    //   gameObject.emit('drop', gameObject, dropZone)
-    //   gameObject.setData('isInDropZone', true)
-    //   // return
-    //   // resource.x = gameObject.x
-    //   // resource.y = gameObject.y
-    // }
-
-    const isDessert = resource?.data?.values.type === ResourceType.Dessert && gameObject instanceof Point
-    if (isDessert) return
-    // console.log({ isDessert, isAlreadySet })
     if (gameObject instanceof Resource) {
-      dropZone.dataService.setDataByKey('resource', gameObject)
-      gameObject.setDepth(1)
-      dropZone.dataService.getDataTyped('point')?.setDepth(2)
+      if (
+        gameObject.dataService.getDataTyped('type') === ResourceType.Dessert &&
+        dropZone.dataService.getDataTyped('point')
+      ) {
+        return
+      }
+      const oldTile = gameObject.dataService.getDataTyped('tile')
+      const targetResource = dropZone.dataService.getDataTyped('resource')
+      console.log({ dropZone, oldTile })
+      if (oldTile && targetResource) dropZone.dataService.getDataTyped('resource')?.setToDropZone(oldTile)
+      if (!oldTile && targetResource) {
+        console.log('resource to origin')
+        targetResource.setToOrigin()
+      }
+      gameObject.setToDropZone(dropZone)
     }
     if (gameObject instanceof Point) {
-      dropZone.dataService.setDataByKey('point', gameObject)
-      gameObject.setDepth(2)
-      dropZone.dataService.getDataTyped('resource')?.setDepth(1)
+      console.log('set point')
+      const oldTile = gameObject.dataService.getDataTyped('tile')
+      const targetPoint = dropZone.dataService.getDataTyped('point')
+      if (oldTile) dropZone.dataService.getDataTyped('point')?.setToDropZone(oldTile)
+      if (!oldTile && targetPoint) targetPoint.setToOrigin()
+      gameObject.setToDropZone(dropZone)
     }
-
-    gameObject.dataService.setDataByKey('isInDropZone', true)
-    gameObject.x = dropZone.getCenterTile().x
-    gameObject.y = dropZone.getCenterTile().y - 3
   }
 
   private hanldeDragEnd(_: Input.Pointer, gameObject: Resource | Point, __: Tile) {
+    console.log('hanldeDragEnd')
+
     gameObject.setAlpha(1)
 
     if (gameObject.dataService.getDataTyped('isInDropZone')) {
@@ -134,18 +104,16 @@ class GameEventManager {
       return
     }
 
-    // Reset position if not in dropzone
-    const { x, y } = gameObject.dataService.getDataTyped('origin')
-    gameObject.setPosition(x, y)
+    console.log('set to origin')
+
+    gameObject.setToOrigin()
   }
 
   private handleRandomize() {
     shuffleArray(this.scene.resources)
     this.scene.resources.forEach((resource, i) => {
       const dropZone = this.scene.tiles[i]
-      resource.x = dropZone.getCenterTile().x
-      resource.y = dropZone.getCenterTile().y - 3
-      this.scene.input.emit('drop', '', resource, dropZone, true)
+      resource.setToDropZone(dropZone)
     })
 
     const tileCopy = [...this.scene.tiles].filter((tile) => {
@@ -157,9 +125,7 @@ class GameEventManager {
     this.scene.points.forEach((point, i) => {
       console.log('random point')
       const dropZone = tileCopy[i]
-      point.x = dropZone.getCenterTile().x
-      point.y = dropZone.getCenterTile().y
-      this.scene.input.emit('drop', '', point, dropZone, true)
+      point.setToDropZone(dropZone)
     })
   }
 }

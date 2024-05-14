@@ -2,6 +2,7 @@ import { GameObjects } from 'phaser'
 import { probalities } from '../config/probalities'
 import { DragableComponentState } from './states'
 import { ComoponentDataService } from '../services/ComponentDataService'
+import Tile from './tile'
 
 class Point extends GameObjects.Container {
   dataService: ComoponentDataService<DragableComponentState> = new ComoponentDataService(this)
@@ -28,6 +29,23 @@ class Point extends GameObjects.Container {
 
     this.scene.input.setDraggable(this)
     scene.add.existing(this)
+  }
+
+  setToDropZone(dropzone: Tile) {
+    this.x = dropzone.getCenterTile().x
+    this.y = dropzone.getCenterTile().y - 3
+    this.dataService.setDataByKey('tile', dropzone)
+    this.dataService.setDataByKey('isInDropZone', true)
+    dropzone.dataService.setDataByKey('point', this)
+    dropzone.dataService.getDataTyped('resource')?.setDepth(1)
+    this.setDepth(2)
+  }
+
+  setToOrigin() {
+    const { x, y } = this.dataService.getDataTyped('origin')
+    this.setPosition(x, y)
+    this.dataService.getDataTyped('tile')?.dataService.setDataByKey('point', undefined)
+    this.dataService.setDataByKey('tile', undefined)
   }
 
   private static createDots(text: GameObjects.Text, numberText: number, scene: Phaser.Scene) {
