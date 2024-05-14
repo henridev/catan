@@ -84,7 +84,7 @@ export class Game extends Scene {
   private addPoints() {
     Object.entries(this.setup.points).forEach(([k, { position, amount }]) => {
       for (let i = 0; i < amount; i++) {
-        this.points.push(new Point(this, position.x, position.y, 60 * 0.4, k as unknown as number))
+        this.points.push(new Point(this, position.x, position.y, TILE_RADIUS * 0.4, k as unknown as number))
       }
     })
   }

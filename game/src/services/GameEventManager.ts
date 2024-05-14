@@ -1,14 +1,10 @@
 import { GameObjects, Input } from 'phaser'
 import { Game } from '../scenes/Game'
-import { TileStateKey, DragableComponentStateKey } from '../state'
 import { Resource as ResourceType } from '../config/modes/type'
 import { shuffleArray } from '../utils/object-utils'
 import Tile from '../components/tile'
 import Resource from '../components/resource'
 import Point from '../components/point'
-
-const { colorOrigin } = TileStateKey
-const { isInDropZone, origin, type } = DragableComponentStateKey
 
 class GameEventManager {
   scene: Game
@@ -49,7 +45,9 @@ class GameEventManager {
   private handleDragStart(_: Input.Pointer, gameObject: Resource | Point) {
     gameObject.setAlpha(0.5)
     this.scene.children.bringToTop(gameObject)
-    console.log({ children: this.scene.children })
+    if (gameObject.dataService.getDataTyped('isInDropZone')) {
+    }
+    gameObject.dataService.setDataByKey('origin', { x: gameObject.x, y: gameObject.y })
   }
 
   private handleDragEnter(_: Input.Pointer, __: Resource | Point, dropZone: Tile) {
@@ -67,83 +65,102 @@ class GameEventManager {
     if (gameObject instanceof Point) {
       values.point = undefined
     }
-    gameObject.setData(isInDropZone, false)
-    dropZone.setFillStyle(dropZone.getData(colorOrigin))
+
+    gameObject.dataService.setDataByKey('isInDropZone', false)
+    dropZone.setFillStyle(dropZone.dataService.getDataTyped('colorOrigin'))
   }
 
-  private hanldeDrop(_: Input.Pointer, gameObject: Resource | Point, dropZone: Tile) {
-    const {
-      data: { values },
-    } = dropZone
+  private hanldeDrop(_: Input.Pointer, gameObject: Resource | Point, dropZone: Tile, isRandomizer?: boolean) {
+    const resource = dropZone.dataService.getDataTyped('resource')
+    const point = dropZone.dataService.getDataTyped('point')
 
-    if (values.resource && values.point) return
-    const isAlreadySet =
-      (values.resource && gameObject instanceof Resource) || (values.point && gameObject instanceof Point)
-    if (isAlreadySet) return
-    const isDessert = values?.resource?.data?.values.type === ResourceType.Dessert && gameObject instanceof Point
+    if (isRandomizer) {
+      if (gameObject instanceof Point) {
+        dropZone.dataService.setDataByKey('point', gameObject)
+        gameObject.dataService.setDataByKey('tile', dropZone)
+        gameObject.setDepth(2)
+      }
+      if (gameObject instanceof Resource) {
+        dropZone.dataService.setDataByKey('resource', gameObject)
+        gameObject.dataService.setDataByKey('tile', dropZone)
+        gameObject.setDepth(1)
+      }
+      return
+    }
+
+    // if (resource && gameObject instanceof Resource) {
+    //   const x = resource.x
+    //   const y = resource.y
+    //   resource.x = gameObject.getData('origin-tile').x
+    //   resource.y = gameObject.getData('origin-tile').y
+    //   gameObject.x = x
+    //   gameObject.y = y
+    //   gameObject.setData('origin-tile', { x: gameObject.x, y: gameObject.y })
+    //   console.log({ x: resource.x, y: resource.y })
+    //   console.log({ x: gameObject.x, y: gameObject.x })
+    //   resource.setData('origin-tile', { x: resource.x, y: resource.y })
+    //   dropZone.dataService.setDataByKey('resource', gameObject)
+    //   gameObject.emit('drop', gameObject, dropZone)
+    //   gameObject.setData('isInDropZone', true)
+    //   // return
+    //   // resource.x = gameObject.x
+    //   // resource.y = gameObject.y
+    // }
+
+    const isDessert = resource?.data?.values.type === ResourceType.Dessert && gameObject instanceof Point
     if (isDessert) return
-
+    // console.log({ isDessert, isAlreadySet })
     if (gameObject instanceof Resource) {
-      values.resource = gameObject
-      values?.resource?.setDepth(1)
-      values?.point?.setDepth(2)
+      dropZone.dataService.setDataByKey('resource', gameObject)
+      gameObject.setDepth(1)
+      dropZone.dataService.getDataTyped('point')?.setDepth(2)
     }
     if (gameObject instanceof Point) {
-      values.point = gameObject
-      values?.resource?.setDepth(1)
-      values?.point?.setDepth(2)
+      dropZone.dataService.setDataByKey('point', gameObject)
+      gameObject.setDepth(2)
+      dropZone.dataService.getDataTyped('resource')?.setDepth(1)
     }
 
-    gameObject.setData(isInDropZone, true)
+    gameObject.dataService.setDataByKey('isInDropZone', true)
     gameObject.x = dropZone.getCenterTile().x
     gameObject.y = dropZone.getCenterTile().y - 3
   }
 
   private hanldeDragEnd(_: Input.Pointer, gameObject: Resource | Point, __: Tile) {
     gameObject.setAlpha(1)
-    console.log('hanldeDragEnd')
 
-    if (gameObject.getData(isInDropZone)) return
-    gameObject.setPosition(gameObject.getData(origin)?.x, gameObject.getData(origin)?.y) // Reset position if not in dropzone
+    if (gameObject.dataService.getDataTyped('isInDropZone')) {
+      gameObject.setDepth(1)
+      return
+    }
+
+    // Reset position if not in dropzone
+    const { x, y } = gameObject.dataService.getDataTyped('origin')
+    gameObject.setPosition(x, y)
   }
 
   private handleRandomize() {
-    // Position the sprite in the center of the drop zone
-    console.log({ scene: this.scene.tiles })
     shuffleArray(this.scene.resources)
     this.scene.resources.forEach((resource, i) => {
-      resource.setData(isInDropZone, true)
-      resource.setDepth(1)
-
       const dropZone = this.scene.tiles[i]
-      const {
-        data: { values },
-      } = dropZone
       resource.x = dropZone.getCenterTile().x
       resource.y = dropZone.getCenterTile().y - 3
-      values.resource = resource
+      this.scene.input.emit('drop', '', resource, dropZone, true)
     })
-    console.log({ scene: this.scene.tiles })
 
-    const tileCopy = [...this.scene.tiles].filter(
-      ({ data: { values } }) => values.resource!.getData(type) !== ResourceType.Dessert,
-    )
+    const tileCopy = [...this.scene.tiles].filter((tile) => {
+      const type = tile.dataService.getDataTyped('resource')?.dataService.getDataTyped('type')!
+      return type !== ResourceType.Dessert
+    })
 
     shuffleArray(this.scene.points)
     this.scene.points.forEach((point, i) => {
-      point.setData(isInDropZone, true)
-      point.setDepth(2)
-
+      console.log('random point')
       const dropZone = tileCopy[i]
-      const {
-        data: { values },
-      } = dropZone
       point.x = dropZone.getCenterTile().x
       point.y = dropZone.getCenterTile().y
-      values.point = point
+      this.scene.input.emit('drop', '', point, dropZone, true)
     })
-
-    console.log({ scene: this.scene.tiles })
   }
 }
 

@@ -1,10 +1,12 @@
 import { GameObjects } from 'phaser'
-import { TileStateKey } from '../state'
+import { ComoponentDataService } from '../services/ComponentDataService'
+import { TileState } from './states'
 import Resource from './resource'
 import Point from './point'
-const { colorOrigin, resource, tile } = TileStateKey
 
 class Tile extends GameObjects.Polygon {
+  dataService: ComoponentDataService<TileState> = new ComoponentDataService(this)
+
   constructor(scene: Phaser.Scene, x: number, y: number, radius: number, fillColor?: number, fillAlpha?: number) {
     const points = Tile.getPoints(x, y, radius)
     const color = new Phaser.Display.Color()
@@ -12,11 +14,8 @@ class Tile extends GameObjects.Polygon {
 
     super(scene, 0, 0, points, fillColor ?? color.color, fillAlpha)
 
-    this.setOrigin(0, 0)
-      .setData(colorOrigin, color.color)
-      .setData(resource, undefined)
-      .setData(tile, undefined)
-      .setInteractive(new Phaser.Geom.Polygon(points), Phaser.Geom.Polygon.Contains, true)
+    this.setOrigin(0, 0).setInteractive(new Phaser.Geom.Polygon(points), Phaser.Geom.Polygon.Contains, true)
+    this.dataService.setDataTyped({ colorOrigin: color.color, resource: undefined, point: undefined })
 
     scene.add.existing(this)
   }
